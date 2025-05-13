@@ -3,3 +3,5 @@
 *.env
 .vscode
 __pycache__
+.cache
+.DS_Store
