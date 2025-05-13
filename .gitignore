@@ -1,7 +1,58 @@
-# Ignore environment variables and VSCode files
+# Environments and Secrets
 .env
 *.env
-.vscode
-__pycache__
-.cache
+config.env
+
+# Virtual Environments
+venv/
+.venv/
+env/
+.env/
+
+# Python Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# Operating System Files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+log/
+
+# Temporary Files
+tmp/
+temp/
+
+# Dependency Directories
+node_modules/
+jspm_packages/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Project-specific ignores
+*.sqlite3
+*.db
