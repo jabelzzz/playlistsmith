@@ -38,3 +38,12 @@ Sort your favorite songs by artist, year, duration, or any criterion you choose 
 ## 🚀 Installation and usage
 
 1. **Clone the repository**
+2. **Configure the .env file with the Spotify credentials**
+3. **Install dependencies**
+```bash
+pipenv install
+```
+4. **Run the application**
+```bash
+pipenv run python main.py
+```

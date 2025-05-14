@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 
 # Search for the configuration file in different locations
 CONFIG_PATH = None
+print(os.path.join(
+        os.path.dirname(__file__), "..", "..", "config.env"
+    ))
 for possible_path in [
     "config.env",  # Current directory
     os.path.join(
