@@ -45,7 +45,8 @@ def validate_spotify_credentials():
         sys.exit(1)
 
 
-def authenticate_spotify(scope="user-library-read"):
+def authenticate_spotify(scope="user-library-read playlist-modify-public playlist-modify-private"):
+    """Authenticate with Spotify and return a Spotify client."""
     try:
         # Get credentials
         client_id, client_secret, redirect_uri = validate_spotify_credentials()
