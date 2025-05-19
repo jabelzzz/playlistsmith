@@ -1,33 +1,33 @@
-"""Clase para gestionar y ordenar playlists de Spotify."""
+"""Class to manage and sort Spotify playlists."""
 
 import spotipy
 from playlistsmith.logic.spotify_auth import authenticate_spotify
 
 
 class PlaylistSorter:
-    """Clase que implementa diferentes métodos de ordenamiento."""
+    """Class that implements different sorting methods."""
 
     def __init__(self, spotify_client: spotipy.Spotify):
-        """Inicializa el modulo ordenador con un cliente de spotify ya logueado"""
+        """Initialize the sorter module with an already authenticated Spotify client."""
         self.spotify_client = spotify_client
 
     def sort_by_popularity(self, playlist_id: str):
-        """Ordena una playlist por popularidad."""
+        """Sort a playlist by popularity."""
         tracks = self.spotify_client.playlist_tracks(playlist_id)["items"]
         return tracks
 
     def sort_by_song_release_date(self, playlist_id: str):
         """
-        Ordena una playlist por fecha de lanzamiento de las canciones.
+        Sort a playlist by song release date.
 
         Args:
-            playlist_id (str): ID de la playlist de Spotify a ordenar
+            playlist_id (str): ID of the Spotify playlist to sort
         """
-        # Obtener los tracks de la playlist
+        # Get playlist tracks
         results = self.spotify_client.playlist_tracks(playlist_id)
         tracks = results["items"]
 
-        # Extraer la información relevante de cada track
+        # Extract relevant information from each track
         track_data = []
         for item in tracks:
             track = item["track"]
@@ -39,10 +39,10 @@ class PlaylistSorter:
                 }
             )
 
-        # Ordenar por fecha de lanzamiento (más antiguo a más reciente)
+        # Sort by release date (oldest to newest)
         sorted_tracks = sorted(
             track_data, key=lambda x: x["release_date"], reverse=True)
 
-        # Reordenar la playlist
+        # Reorder the playlist
         track_uris = [track["uri"] for track in sorted_tracks]
         self.spotify_client.playlist_replace_items(playlist_id, track_uris)

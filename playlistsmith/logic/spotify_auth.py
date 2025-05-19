@@ -18,7 +18,7 @@ for possible_path in [
         break
 
 if not CONFIG_PATH:
-    print("Error: No se encontró el archivo de configuración config.env")
+    print("Error: Configuration file config.env not found")
     sys.exit(1)
 
 
@@ -34,14 +34,14 @@ def validate_spotify_credentials():
         redirect_uri = os.getenv("SPOTIPY_REDIRECT_URI")
 
         if not all([client_id, client_secret, redirect_uri]):
-            print("Error: Faltan credenciales de Spotify en config.env")
+            print("Error: Missing Spotify credentials in config.env")
             sys.exit(1)
 
         return client_id, client_secret, redirect_uri
 
     except Exception as e:
-        print(f"❌ Error: {e}")
-        print("Sigue las instrucciones de configuración")
+        print(f" Error: {e}")
+        print("Please follow the setup instructions")
         sys.exit(1)
 
 
@@ -65,22 +65,22 @@ def authenticate_spotify(scope="user-library-read playlist-modify-public playlis
             # If no cached token, initiate authorization flow
             auth_url = sp_oauth.get_authorize_url()
             print(
-                f"Por favor, visita esta URL para autorizar la aplicación: {auth_url}"
+                f"Please visit this URL to authorize the application: {auth_url}"
             )
-            response = input("Introduce la URL a la que fuiste redirigido: ")
+            response = input("Enter the URL you were redirected to: ")
             code = sp_oauth.parse_response_code(response)
             token_info = sp_oauth.get_access_token(code)
 
         return spotipy.Spotify(auth_manager=sp_oauth)
 
     except spotipy.SpotifyException as e:
-        print(f"Error de Spotify API: {e}")
+        print(f"Spotify API Error: {e}")
         return None
     except spotipy.oauth2.SpotifyOauthError as e:
-        print(f"Error de autenticación OAuth: {e}")
+        print(f"OAuth Authentication Error: {e}")
         return None
     except requests.exceptions.RequestException as e:
-        print(f"Error de solicitud de red: {e}")
+        print(f"Network Request Error: {e}")
         return None
 
 

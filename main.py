@@ -4,30 +4,30 @@ from playlistsmith.logic.sort_playlist import PlaylistSorter
 
 
 def main():
-    """Función principal para autenticar y gestionar listas de reproducción."""
+    """Main function to authenticate and manage playlists."""
     spotify_client = authenticate_spotify(scope="user-library-read playlist-modify-public playlist-modify-private")
     if not spotify_client:
         sys.exit(1)
 
-    print(f"Bienvenido a PlaylistSmith {spotify_client.current_user()['display_name']}")
+    print(f"Welcome to PlaylistSmith {spotify_client.current_user()['display_name']}")
 
-    # Obtener listas de reproducción
-    print("\nTus listas de reproducción disponibles son:")
+    # Get playlists
+    print("\nYour available playlists:")
     playlists = spotify_client.current_user_playlists()
 
     for i, playlist in enumerate(playlists["items"], 1):
         print(f"{i}. {playlist['name']} - {playlist['id']}")
 
-    # Seleccionar lista para ordenar
+    # Select playlist to sort
     try:
         selection = (
-            int(input("\nSelecciona el número de la lista que deseas ordenar: ")) - 1
+            int(input("\nEnter the number of the playlist you want to sort: ")) - 1
         )
         selected_playlist = playlists["items"][selection]
-        print(f"\nHas seleccionado: {selected_playlist['name']}")
-        option = input("""¿Como deseas ordenarla?
-        1. Por popularidad
-        2. Por fecha de lanzamiento de las canciones
+        print(f"\nYou selected: {selected_playlist['name']}")
+        option = input("""How would you like to sort it?
+        1. By popularity
+        2. By song release date
         """)
         sorter = PlaylistSorter(spotify_client)
         if option == "1":
@@ -36,7 +36,7 @@ def main():
             sorter.sort_by_song_release_date(selected_playlist["id"])
 
     except (ValueError, IndexError):
-        print("Selección inválida. Por favor, intenta de nuevo.")
+        print("Invalid selection. Please try again.")
         return
 
 
