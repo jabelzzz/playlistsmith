@@ -8,6 +8,7 @@ customtkinter = "*"
 spotipy = "*"
 python-dotenv = "*"
 dotenv = "*"
+debugpy = "*"
 
 [dev-packages]
 

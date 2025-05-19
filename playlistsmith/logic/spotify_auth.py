@@ -70,7 +70,7 @@ def authenticate_spotify(scope="user-library-read playlist-modify-public playlis
             response = input("Enter the URL you were redirected to: ")
             code = sp_oauth.parse_response_code(response)
             token_info = sp_oauth.get_access_token(code)
-
+        #TODO: Improve the screen when the user introduce the URL
         return spotipy.Spotify(auth_manager=sp_oauth)
 
     except spotipy.SpotifyException as e:

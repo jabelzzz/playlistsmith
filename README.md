@@ -14,10 +14,9 @@ Sort your favorite songs by artist, year, duration, or any criterion you choose 
 - 🎶 Visualize your playlists and their songs
 - 🧠 Order by:
   - Artist
-  - Release year
-  - Release date on Spotify
+  - Release date 
   - Duration
-  - Song name
+  - Popularity
 
 - 🛠️ Create new playlists based on these criteria
 - 💻 Graphical interface (no boring console)
