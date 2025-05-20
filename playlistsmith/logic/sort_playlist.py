@@ -10,7 +10,33 @@ class PlaylistSorter:
     def __init__(self, spotify_client: spotipy.Spotify):
         """Initialize the sorter module with an already authenticated Spotify client."""
         self.spotify_client = spotify_client
-#TODO: Obtener todas las canciones, actualmente solo obtienen 100
+
+    def get_all_tracks(self, playlist_id: str):
+        """
+        Retrieve all tracks from a playlist, handling pagination.
+
+        Args:
+            playlist_id (str): ID of the Spotify playlist
+
+        Returns:
+            list: A list of all tracks in the playlist
+        """
+        tracks = []
+        offset = 0
+        limit = 100
+
+        while True:
+            results = self.spotify_client.playlist_tracks(playlist_id, offset=offset, limit=limit)
+            tracks.extend(results["items"])
+
+            # Check if there are more tracks to fetch
+            if len(results["items"]) < limit:
+                break
+
+            offset += limit
+
+        return tracks
+
     def sort_by_artist(self, playlist_id: str):
         """
         Sort a playlist by artist name.
@@ -18,9 +44,12 @@ class PlaylistSorter:
         Args:
             playlist_id (str): ID of the Spotify playlist to sort
         """
-        # Get playlist tracks
-        results = self.spotify_client.playlist_tracks(playlist_id)
-        tracks = results["items"]
+        # Get all playlist tracks
+        tracks = self.get_all_tracks(playlist_id)
+
+        if not tracks:
+            print("No tracks found in the playlist.")
+            return
 
         # Extract relevant information from each track
         track_data = []
@@ -49,8 +78,7 @@ class PlaylistSorter:
             playlist_id (str): ID of the Spotify playlist to sort
         """
         # Get playlist tracks
-        results = self.spotify_client.playlist_tracks(playlist_id)
-        tracks = results["items"]
+        tracks = self.get_all_tracks(playlist_id)
 
         # Extract relevant information from each track
         track_data = []
@@ -82,8 +110,7 @@ class PlaylistSorter:
             playlist_id (str): ID of the Spotify playlist to sort
         """
         # Get playlist tracks
-        results = self.spotify_client.playlist_tracks(playlist_id)
-        tracks = results["items"]
+        tracks= self.get_all_tracks(playlist_id)
 
         # Extract relevant information from each track
         track_data = []
@@ -112,8 +139,7 @@ class PlaylistSorter:
             playlist_id (str): ID of the Spotify playlist to sort
         """
         # Get playlist tracks
-        results = self.spotify_client.playlist_tracks(playlist_id)
-        tracks = results["items"]
+        tracks = self.get_all_tracks(playlist_id)
 
         # Extract relevant information from each track
         track_data = []
@@ -127,7 +153,7 @@ class PlaylistSorter:
                 }
             )
 
-        # Sort by release date (oldest to newest)
+        # Sort by popularity (oldest to newest)
         sorted_tracks = sorted(track_data, key=lambda x: x["popularity"], reverse=True)
 
         # Reorder the playlist
