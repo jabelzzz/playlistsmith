@@ -56,3 +56,6 @@ jspm_packages/
 # Project-specific ignores
 *.sqlite3
 *.db
+
+# Cache files
+.cache
