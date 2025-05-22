@@ -36,7 +36,7 @@ class PlaylistSorter:
             offset += limit
 
         return tracks
-
+#TODO: Let the user choose the tracks position when sorting
     def sort_by_artist(self, playlist_id: str):
         """
         Sort a playlist by artist name.
