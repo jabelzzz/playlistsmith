@@ -37,6 +37,23 @@ class PlaylistSorter:
 
         return tracks
 
+    def reorder_playlist_in_batches(self, playlist_id: str, track_uris: list):
+        """
+        Reorder a playlist in batches of 100 tracks.
+
+        Args:
+            playlist_id (str): ID of the Spotify playlist
+            track_uris (list): List of track URIs to reorder
+        """
+        for i in range(0, len(track_uris), 100):
+            batch = track_uris[i:i + 100]
+            if i == 0:
+                # Replace the initial items in the playlist
+                self.spotify_client.playlist_replace_items(playlist_id, batch)
+            else:
+                # Add the remaining items to the playlist
+                self.spotify_client.playlist_add_items(playlist_id, batch)
+
     def sort_by_artist(self, playlist_id: str):
         """
         Sort a playlist by artist name.
@@ -66,9 +83,9 @@ class PlaylistSorter:
         # Sort by artist name (A-Z)
         sorted_tracks = sorted(track_data, key=lambda x: x["artist"])
 
-        # Reorder the playlist
+        # Reorder the playlist in batches
         track_uris = [track["uri"] for track in sorted_tracks]
-        self.spotify_client.playlist_replace_items(playlist_id, track_uris)
+        self.reorder_playlist_in_batches(playlist_id, track_uris)
 
     def sort_by_release_date(self, playlist_id: str):
         """
