@@ -40,7 +40,7 @@ def validate_spotify_credentials():
         return client_id, client_secret, redirect_uri
 
     except Exception as e:
-        print(f" Error: {e}")
+        print(f"Error: {e}")
         print("Please follow the setup instructions")
         sys.exit(1)
 

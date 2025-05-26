@@ -88,21 +88,21 @@ class PlaylistSorter:
 
         # Reorder the playlist
         while True:
-            order = input("Elige el orden:\n1. De A a Z\n2. De Z a A\n> ")
+            order = input("Choose the order:\n1. A to Z\n2. Z to A\n> ")
             if order == "1":
-                print("Ordenando canciones...")
+                print("Sorting songs...")
                 sorted_tracks = sorted(
                     track_data, key=lambda x: x["artist"], reverse=False
                 )
                 break
             elif order == "2":
-                print("Ordenando canciones...")
+                print("Sorting songs...")
                 sorted_tracks = sorted(
                     track_data, key=lambda x: x["artist"], reverse=True
                 )
                 break
             else:
-                print("Opción no válida. Por favor, elige 1 o 2.")
+                print("Invalid option. Please choose 1 or 2.")
 
         track_uris = [track["uri"] for track in sorted_tracks]
         self.reorder_playlist_in_batches(playlist_id, track_uris)
@@ -134,16 +134,16 @@ class PlaylistSorter:
         # Reorder the playlist
         while True:
             order = input(
-                "Elige el orden:\n1. De más nueva a más vieja\n2. De más vieja a más nueva\n> "
+                "Choose the order:\n1. Newest to Oldest\n2. Oldest to Newest\n> "
             )
             if order == "1":
-                print("Ordenando canciones...")
+                print("Sorting songs...")
                 sorted_tracks = sorted(
                     track_data, key=lambda x: x["release_date"], reverse=True
                 )
                 break
             elif order == "2":
-                print("Ordenando canciones...")
+                print("Sorting songs...")
                 sorted_tracks = sorted(
                     track_data, key=lambda x: x["release_date"], reverse=False
                 )
@@ -179,16 +179,16 @@ class PlaylistSorter:
         # Reorder the playlist
         while True:
             order = input(
-                "Elige el orden:\n1. De más larga a más corta\n2. De más corta más larga\n> "
+                "Choose the order:\n1. Longest to Shortest\n2. Shortest to Longest\n> "
             )
             if order == "1":
-                print("Ordenando canciones...")
+                print("Sorting songs...")
                 sorted_tracks = sorted(
                     track_data, key=lambda x: x["duration_ms"], reverse=True
                 )
                 break
             elif order == "2":
-                print("Ordenando canciones...")
+                print("Sorting songs...")
                 sorted_tracks = sorted(
                     track_data, key=lambda x: x["duration_ms"], reverse=False
                 )
@@ -224,16 +224,16 @@ class PlaylistSorter:
         # Reorder the playlist
         while True:
             order = input(
-                "Elige el orden:\n1. De más popular a menos popular\n2. De menos popular a más popular\n> "
+                "Choose the order:\n1. Most popular to Least popular\n2. Least popular to Most popular\n> "
             )
             if order == "1":
-                print("Ordenando canciones...")
+                print("Sorting songs...")
                 sorted_tracks = sorted(
                     track_data, key=lambda x: x["popularity"], reverse=True
                 )
                 break
             elif order == "2":
-                print("Ordenando canciones...")
+                print("Sorting songs...")
                 sorted_tracks = sorted(
                     track_data, key=lambda x: x["popularity"], reverse=False
                 )
