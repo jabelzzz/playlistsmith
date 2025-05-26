@@ -10,6 +10,8 @@ class PlaylistSorter:
     def __init__(self, spotify_client: spotipy.Spotify):
         """Initialize the sorter module with an already authenticated Spotify client."""
         self.spotify_client = spotify_client
+        if not self.spotify_client:
+            raise ValueError("Spotify client is not authenticated. Please authenticate first.")
 
     def get_all_tracks(self, playlist_id: str):
         """
@@ -26,7 +28,9 @@ class PlaylistSorter:
         limit = 100
 
         while True:
-            results = self.spotify_client.playlist_tracks(playlist_id, offset=offset, limit=limit)
+            results = self.spotify_client.playlist_tracks(
+                playlist_id, offset=offset, limit=limit
+            )
             tracks.extend(results["items"])
 
             # Check if there are more tracks to fetch
@@ -46,7 +50,7 @@ class PlaylistSorter:
             track_uris (list): List of track URIs to reorder
         """
         for i in range(0, len(track_uris), 100):
-            batch = track_uris[i:i + 100]
+            batch = track_uris[i : i + 100]
             if i == 0:
                 # Replace the initial items in the playlist
                 self.spotify_client.playlist_replace_items(playlist_id, batch)
@@ -119,7 +123,6 @@ class PlaylistSorter:
         self.spotify_client.playlist_replace_items(playlist_id, track_uris)
 
     def sort_by_duration(self, playlist_id: str):
-
         """
         Sort a playlist by track duration.
 
@@ -127,7 +130,7 @@ class PlaylistSorter:
             playlist_id (str): ID of the Spotify playlist to sort
         """
         # Get playlist tracks
-        tracks= self.get_all_tracks(playlist_id)
+        tracks = self.get_all_tracks(playlist_id)
 
         # Extract relevant information from each track
         track_data = []
