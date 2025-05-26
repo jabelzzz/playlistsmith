@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 customtkinter = "*"
-spotipy = "*"
 python-dotenv = "*"
 dotenv = "*"
 debugpy = "*"
+spotipy = "*"
 
 [dev-packages]
 
