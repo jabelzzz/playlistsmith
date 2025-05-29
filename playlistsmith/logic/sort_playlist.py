@@ -1,8 +1,6 @@
 """Class to manage and sort Spotify playlists."""
 
 import spotipy
-from playlistsmith.logic.spotify_auth import authenticate_spotify
-
 
 class PlaylistSorter:
     """Class that implements different sorting methods."""
@@ -224,7 +222,9 @@ class PlaylistSorter:
         # Reorder the playlist
         while True:
             order = input(
-                "Choose the order:\n1. Most popular to Least popular\n2. Least popular to Most popular\n> "
+                "Choose the order:"
+                "\n1. Most popular to Least popular"
+                "\n2. Least popular to Most popular\n> "
             )
             if order == "1":
                 print("Sorting songs...")
