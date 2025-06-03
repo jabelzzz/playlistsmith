@@ -5,13 +5,15 @@ from playlistsmith.logic.sort_playlist import PlaylistSorter
 
 def main():
     """Main function to authenticate and manage playlists."""
-    spotify_client = authenticate_spotify(
-        scope="user-library-read playlist-modify-public playlist-modify-private"
-    )
-    if not spotify_client:
+    try:
+        spotify_client = authenticate_spotify(
+            scope="user-library-read playlist-modify-public playlist-modify-private"
+        )        
+        print(f"Welcome to PlaylistSmith {spotify_client.current_user()['display_name']}")
+    except Exception as e:
+        print(f"An error occurred during authentication: {e}")
+        print("Exiting the application.")
         sys.exit(1)
-
-    print(f"Welcome to PlaylistSmith {spotify_client.current_user()['display_name']}")
 
     # Select playlist to sort
     try:

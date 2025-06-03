@@ -1,17 +1,20 @@
-"""Handles Spotify authentication logic."""
-
 import os
 import sys
 import spotipy
 import requests
+import webbrowser
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
+from playlistsmith.utils.http_handler import start_http_server
+from http.server import HTTPServer
 
 # Search for the configuration file in different locations
 CONFIG_PATH = None
 for possible_path in [
-    "config.env", # Current directory
-    os.path.join(os.path.dirname(__file__), "..", "..", "config.env"), # Parent directory
+    "config.env",  # Current directory
+    os.path.join(
+        os.path.dirname(__file__), "..", "..", "config.env"
+    ),  # Parent directory
 ]:
     if os.path.exists(possible_path):
         CONFIG_PATH = possible_path
@@ -45,7 +48,9 @@ def validate_spotify_credentials():
         sys.exit(1)
 
 
-def authenticate_spotify(scope="user-library-read playlist-modify-public playlist-modify-private"):
+def authenticate_spotify(
+    scope="user-library-read playlist-modify-public playlist-modify-private",
+):
     """Authenticate with Spotify and return a Spotify client."""
     try:
         # Get credentials
@@ -64,23 +69,21 @@ def authenticate_spotify(scope="user-library-read playlist-modify-public playlis
         if not token_info:
             # If no cached token, initiate authorization flow
             auth_url = sp_oauth.get_authorize_url()
-            print(
-                f"Please visit this URL to authorize the application: {auth_url}"
-            )
-            response = input("Enter the URL you were redirected to: ")
-            code = sp_oauth.parse_response_code(response)
+            webbrowser.open(auth_url)
+
+            # Start the HTTP server to capture the redirect
+            server_code = start_http_server(port=8888)
+            print("Waiting for Spotify authorization...")
+
+            if not server_code:
+                raise Exception("Authorization failed. No code received.")
+
             token_info = sp_oauth.get_access_token(code)
-        #TODO: Improve the screen when the user introduce the URL
+
         return spotipy.Spotify(auth_manager=sp_oauth)
 
-    except spotipy.SpotifyException as e:
-        print(f"Spotify API Error: {e}")
-        return None
-    except spotipy.oauth2.SpotifyOauthError as e:
-        print(f"OAuth Authentication Error: {e}")
-        return None
-    except requests.exceptions.RequestException as e:
-        print(f"Network Request Error: {e}")
+    except Exception as e:
+        print(f"Error during authentication: {e}")
         return None
 
 
