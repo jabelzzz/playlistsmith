@@ -29,7 +29,7 @@ Sort your favorite songs by artist, year, duration, or any criterion you choose 
 - 🐍 Python 3.10+
 - 🎧 [Spotipy](https://spotipy.readthedocs.io/)
 - 🎨 [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter)
-- 🗃️ SQLite (optional for history)
+- 🌐 HTTPServer (for local Spotify authorization handling)
 - 📦 Pipenv (environment manager)
 
 ---

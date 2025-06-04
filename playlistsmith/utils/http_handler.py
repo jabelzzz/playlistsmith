@@ -18,5 +18,7 @@ def start_http_server(port=8888):
     """Start the HTTP server and capture the authorization code."""
     server = HTTPServer(("localhost", port), RedirectHandler)
     print(f"Starting HTTP server on port {port}...")
-    server.handle_request()  # This will block until a request is received
+    server.handle_request()
+    server.server_close()
+    print("HTTP server stopped.")
     return server.code
