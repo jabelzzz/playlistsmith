@@ -11,7 +11,8 @@ class RedirectHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(
             b"Authorization successful! You can close this window.")
-        self.server.code = code
+        #Assing an atribute by default to code
+        setattr(self.server, "code", code)
 
 
 def start_http_server(port=8888):
@@ -21,4 +22,5 @@ def start_http_server(port=8888):
     server.handle_request()
     server.server_close()
     print("HTTP server stopped.")
-    return server.code
+    #Return by default None if no code parameter in the URL
+    return getattr(server, "code", None)

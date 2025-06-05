@@ -1,5 +1,3 @@
-"""Class to manage and sort Spotify playlists."""
-
 import spotipy
 
 class PlaylistSorter:

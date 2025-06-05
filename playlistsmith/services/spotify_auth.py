@@ -77,8 +77,10 @@ def authenticate_spotify(
 
             if not server_code:
                 raise Exception("Authorization failed. No code received.")
-
-            token_info = sp_oauth.get_access_token(code)
+            
+            print(f"Authorization code received: {server_code}")
+            
+            token_info = sp_oauth.get_access_token(server_code)
 
         return spotipy.Spotify(auth_manager=sp_oauth)
 

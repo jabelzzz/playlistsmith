@@ -1,22 +1,34 @@
 import customtkinter
-from playlistsmith.ui.screens.login_screen import LoginScreen
+from playlistsmith.ui.screens.playlist_selection_screen import PlaylistSelectionScreen
+from playlistsmith.ui.screens.playlist_detail_screen import PlaylistDetailScreen
 
 
-class App(customtkinter.CTk):
-    def __init__(self):
+class MainWindow(customtkinter.CTk):
+    def __init__(self, spotify_client):
         super().__init__()
-
+        self.spotify_client = spotify_client
         self.title("PlaylistSmith")
-        self.iconbitmap("playlistsmith/ui/assets/icon.ico")
-        self.geometry("400x180")
+        self.iconbitmap("playlistsmith/assets/ps_icon.ico")
+        self.geometry("800x600")
         self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.current_screen = None
+        self.show_playlist_selection()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
+    def show_playlist_selection(self):
+        if self.current_screen:
+            self.current_screen.destroy()
+        self.current_screen = PlaylistSelectionScreen(
+            self, self.spotify_client, self.show_playlist_detail)
 
-try:
-    login_screen = LoginScreen()
-    login_screen.mainloop()
-except Exception as e:
-    print(f"An error occurred: {e}")
-    exit(1)
-app = App()
-app.mainloop()
+    def show_playlist_detail(self, playlist_id):
+        if self.current_screen:
+            self.current_screen.destroy()
+        self.current_screen = PlaylistDetailScreen(
+            self, playlist_id, self.spotify_client, self.show_playlist_selection)
+        
+    def on_closing(self):
+        print("Cerrando la aplicación...")
+        self.destroy()  # Cierra la ventana
+        exit()  # Termina el programa

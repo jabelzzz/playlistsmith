@@ -1,56 +1,15 @@
-import sys
-from playlistsmith.logic.spotify_auth import authenticate_spotify
-from playlistsmith.logic.sort_playlist import PlaylistSorter
+from playlistsmith.services.spotify_auth import authenticate_spotify
+from playlistsmith.ui.main_window import MainWindow
 
 
 def main():
-    """Main function to authenticate and manage playlists."""
-    try:
-        spotify_client = authenticate_spotify(
-            scope="user-library-read playlist-modify-public playlist-modify-private"
-        )        
-        print(f"Welcome to PlaylistSmith {spotify_client.current_user()['display_name']}")
-    except Exception as e:
-        print(f"An error occurred during authentication: {e}")
-        print("Exiting the application.")
-        sys.exit(1)
-
-    # Select playlist to sort
-    try:
-        while True:
-            # Get playlists
-            print("\nYour available playlists:")
-            playlists = spotify_client.current_user_playlists()
-
-            for i, playlist in enumerate(playlists["items"], 1):
-                print(f"{i}. {playlist['name']} - {playlist['id']}")
-
-            selection = (
-                int(input("\nEnter the number of the playlist you want to sort: ")) - 1
-            )
-            selected_playlist = playlists["items"][selection]
-            print(f"\nYou selected: {selected_playlist['name']}")
-            option = input(
-                """How would you like to sort it?
-                1. Artist
-                2. Release date
-                3. Duration
-                4. Popularity
-                Enter the option: """
-            )
-            sorter = PlaylistSorter(spotify_client)
-            if option == "1":
-                sorter.sort_by_artist(selected_playlist["id"])
-            elif option == "2":
-                sorter.sort_by_release_date(selected_playlist["id"])
-            elif option == "3":
-                sorter.sort_by_duration(selected_playlist["id"])
-            elif option == "4":
-                sorter.sort_by_popularity(selected_playlist["id"])
-
-    except (ValueError, IndexError):
-        print("Invalid selection. Please try again.")
+    # Autentica al usuario antes de lanzar la interfaz
+    spotify_client = authenticate_spotify()
+    if not spotify_client:
+        print("No se pudo autenticar con Spotify.")
         return
+    app = MainWindow(spotify_client)
+    app.mainloop()
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import customtkinter
-from playlistsmith.logic.spotify_auth import authenticate_spotify
+from playlistsmith.services.spotify_auth import authenticate_spotify
+__all__ = ["LoginScreen"]
 
 
 class LoginScreen(customtkinter.CTk):
