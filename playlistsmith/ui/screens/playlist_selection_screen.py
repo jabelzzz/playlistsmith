@@ -12,16 +12,13 @@ class PlaylistSelectionScreen(customtkinter.CTkFrame):
         self.grid(sticky="nsew")
         self.create_playlist_buttons()
 
-    # TODO: Finish the playlist buttons function dinamically using the spotify_client.playlists[] 
-
     def create_playlist_buttons(self):
-        playlist = PlaylistSorter
-        # Ejemplo de placeholder
+        # TODO: Finish the playlist buttons function dynamically using spotify_client.playlists[]
         label = customtkinter.CTkLabel(
-            self, text="Selecciona una playlist", font=("Arial", 16))
+            self, text="Select a playlist", font=("Arial", 16))
         label.pack(pady=20)
-        # Aquí iría la lógica para crear un botón por cada playlist
-        # Por ahora, solo un botón de ejemplo
-        btn = customtkinter.CTkButton(self, text="Playlist de ejemplo",
-                                      command=lambda: self.on_playlist_selected("playlist_id_ejemplo"))
+        # Here will go the logic to create a button for each playlist
+        # For now, just an example button
+        btn = customtkinter.CTkButton(self, text="Example playlist",
+                                      command=lambda: self.on_playlist_selected("playlist_id_example"))
         btn.pack(pady=10)

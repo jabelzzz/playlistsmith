@@ -19,10 +19,9 @@ class PlaylistDetailScreen(customtkinter.CTkFrame):
             self, text="← Playlists", command=self.on_back)
         back_btn.place(x=10, y=10)
 
-    # TODO: Finish the table to show the playlist songs
+    
     def show_playlist_songs(self):
-        # Placeholder para la tabla de canciones
         label = customtkinter.CTkLabel(
             self, text=f"Playlist Songs: {self.playlist_id}", font=("Arial", 14))
         label.pack(pady=50)
-        # Aquí iría la tabla y los métodos de ordenación
+        # TODO: Finish the table to show the playlist songs

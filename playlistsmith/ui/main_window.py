@@ -27,8 +27,8 @@ class MainWindow(customtkinter.CTk):
             self.current_screen.destroy()
         self.current_screen = PlaylistDetailScreen(
             self, playlist_id, self.spotify_client, self.show_playlist_selection)
-        
+
     def on_closing(self):
-        print("Cerrando la aplicación...")
-        self.destroy()  # Cierra la ventana
-        exit()  # Termina el programa
+        print("Closing the application...")
+        self.destroy()
+        exit()

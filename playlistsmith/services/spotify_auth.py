@@ -1,12 +1,10 @@
 import os
 import sys
 import spotipy
-import requests
 import webbrowser
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 from playlistsmith.utils.http_handler import start_http_server
-from http.server import HTTPServer
 
 # Search for the configuration file in different locations
 CONFIG_PATH = None

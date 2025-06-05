@@ -37,6 +37,6 @@ class LoginScreen(customtkinter.CTk):
             print("Spotify authentication failed")
 
     def on_closing(self):
-        print("Cerrando la aplicación...")
-        self.destroy()  # Cierra la ventana
-        exit()  # Termina el programa
+        print("Closing the application...")
+        self.destroy()
+        exit()

@@ -3,10 +3,10 @@ from playlistsmith.ui.main_window import MainWindow
 
 
 def main():
-    # Autentica al usuario antes de lanzar la interfaz
+    # Authenticate the user before launching the interface
     spotify_client = authenticate_spotify()
     if not spotify_client:
-        print("No se pudo autenticar con Spotify.")
+        print("Could not authenticate with Spotify.")
         return
     app = MainWindow(spotify_client)
     app.mainloop()

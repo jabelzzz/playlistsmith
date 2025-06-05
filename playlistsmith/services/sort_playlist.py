@@ -1,4 +1,6 @@
 import spotipy
+from playlistsmith.services.spotify_auth import authenticate_spotify
+
 
 class PlaylistSorter:
     """Class that implements different sorting methods."""
@@ -24,11 +26,9 @@ class PlaylistSorter:
         tracks = []
         offset = 0
         limit = 100
-
+        # TODO: Check the logic here to use the spotify_client here to obtain the results
         while True:
-            results = self.spotify_client.playlist_tracks(
-                playlist_id, offset=offset, limit=limit
-            )
+            results = self.spotify_client.playlist["items"]
             tracks.extend(results["items"])
 
             # Check if there are more tracks to fetch
@@ -48,7 +48,7 @@ class PlaylistSorter:
             track_uris (list): List of track URIs to reorder
         """
         for index in range(0, len(track_uris), 100):
-            batch = track_uris[index : index + 100]
+            batch = track_uris[index: index + 100]
             if index == 0:
                 # Replace the initial items in the playlist
                 self.spotify_client.playlist_replace_items(playlist_id, batch)
