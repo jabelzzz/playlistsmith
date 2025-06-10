@@ -9,6 +9,8 @@ python-dotenv = "*"
 dotenv = "*"
 debugpy = "*"
 spotipy = "*"
+requests = "*"
+pillow = "*"
 
 [dev-packages]
 

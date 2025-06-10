@@ -1,13 +1,10 @@
-import spotipy
-from playlistsmith.services.spotify_auth import authenticate_spotify
-
-
 class PlaylistSorter:
     """Class that implements different sorting methods."""
 
-    def __init__(self, spotify_client: spotipy.Spotify):
+    def __init__(self, spotify_client):
         """Initialize the sorter module with an already authenticated Spotify client."""
         self.spotify_client = spotify_client
+        self.playlist_id = None
         if not self.spotify_client:
             raise ValueError(
                 "Spotify client is not authenticated. Please authenticate first."
