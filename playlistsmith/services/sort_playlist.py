@@ -1,16 +1,17 @@
+
 class PlaylistSorter:
     """Class that implements different sorting methods."""
 
-    def __init__(self, spotify_client):
+    def __init__(self, spotify_client, playlist_id: str):
         """Initialize the sorter module with an already authenticated Spotify client."""
         self.spotify_client = spotify_client
-        self.playlist_id = None
+        self.playlist_id = playlist_id
         if not self.spotify_client:
             raise ValueError(
                 "Spotify client is not authenticated. Please authenticate first."
             )
 
-    def get_all_tracks(self, playlist_id: str):
+    def get_all_tracks(self):
         """
         Retrieve all tracks from a playlist, handling pagination.
 
@@ -23,12 +24,10 @@ class PlaylistSorter:
         tracks = []
         offset = 0
         limit = 100
-        # TODO: Check the logic here to use the spotify_client here to obtain the results
         while True:
             results = self.spotify_client.playlist["items"]
             tracks.extend(results["items"])
 
-            # Check if there are more tracks to fetch
             if len(results["items"]) < limit:
                 break
 
@@ -36,32 +35,28 @@ class PlaylistSorter:
 
         return tracks
 
-    def reorder_playlist_in_batches(self, playlist_id: str, track_uris: list):
+    def reorder_playlist_in_batches(self, track_uris: list):
         """
         Reorder a playlist in batches of 100 tracks.
 
         Args:
-            playlist_id (str): ID of the Spotify playlist
             track_uris (list): List of track URIs to reorder
         """
         for index in range(0, len(track_uris), 100):
             batch = track_uris[index: index + 100]
             if index == 0:
-                # Replace the initial items in the playlist
-                self.spotify_client.playlist_replace_items(playlist_id, batch)
+                self.spotify_client.playlist_replace_items(self.playlist_id, batch)
             else:
-                # Add the remaining items to the playlist
-                self.spotify_client.playlist_add_items(playlist_id, batch)
+                self.spotify_client.playlist_add_items(self.playlist_id, batch)
 
-    def sort_by_artist(self, playlist_id: str):
+    def sort_by_artist(self):
         """
         Sort a playlist by artist name.
 
         Args:
             playlist_id (str): ID of the Spotify playlist to sort
         """
-        # Get all playlist tracks
-        tracks = self.get_all_tracks(playlist_id)
+        tracks = self.get_all_tracks()
 
         if not tracks:
             print("No tracks found in the playlist.")
@@ -98,9 +93,9 @@ class PlaylistSorter:
                 print("Invalid option. Please choose 1 or 2.")
 
         track_uris = [track["uri"] for track in sorted_tracks]
-        self.reorder_playlist_in_batches(playlist_id, track_uris)
+        self.reorder_playlist_in_batches(track_uris)
 
-    def sort_by_release_date(self, playlist_id: str):
+    def sort_by_release_date(self):
         """
         Sort a playlist by release date.
 
@@ -108,7 +103,7 @@ class PlaylistSorter:
             playlist_id (str): ID of the Spotify playlist to sort
         """
         # Get playlist tracks
-        tracks = self.get_all_tracks(playlist_id)
+        tracks = self.get_all_tracks()
         if not tracks:
             print("No tracks found in the playlist.")
             return
@@ -142,10 +137,9 @@ class PlaylistSorter:
                 )
                 break
         track_uris = [track["uri"] for track in sorted_tracks]
-        # Reemplazar la lista de reproducción en lotes
-        self.reorder_playlist_in_batches(playlist_id, track_uris)
+        self.reorder_playlist_in_batches(track_uris)
 
-    def sort_by_duration(self, playlist_id: str):
+    def sort_by_duration(self):
         """
         Sort a playlist by track duration.
 
@@ -153,7 +147,7 @@ class PlaylistSorter:
             playlist_id (str): ID of the Spotify playlist to sort
         """
         # Get playlist tracks
-        tracks = self.get_all_tracks(playlist_id)
+        tracks = self.get_all_tracks()
         if not tracks:
             print("No tracks found in the playlist.")
             return
@@ -188,10 +182,9 @@ class PlaylistSorter:
                 break
 
         track_uris = [track["uri"] for track in sorted_tracks]
-        # Reemplazar la lista de reproducción en lotes
-        self.reorder_playlist_in_batches(playlist_id, track_uris)
+        self.reorder_playlist_in_batches(track_uris)
 
-    def sort_by_popularity(self, playlist_id: str):
+    def sort_by_popularity(self):
         """
         Sort a playlist by popularity.
 
@@ -199,7 +192,7 @@ class PlaylistSorter:
             playlist_id (str): ID of the Spotify playlist to sort
         """
         # Get playlist tracks
-        tracks = self.get_all_tracks(playlist_id)
+        tracks = self.get_all_tracks()
         if not tracks:
             print("No tracks found in the playlist.")
             return
@@ -235,5 +228,4 @@ class PlaylistSorter:
                 break
 
         track_uris = [track["uri"] for track in sorted_tracks]
-        # Reemplazar la lista de reproducción en lotes
-        self.reorder_playlist_in_batches(playlist_id, track_uris)
+        self.reorder_playlist_in_batches(track_uris)

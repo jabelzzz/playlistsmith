@@ -3,17 +3,14 @@ from io import BytesIO
 import os
 from PIL import Image
 import customtkinter
-from playlistsmith.ui.screens.playlist_detail_screen import PlaylistDetailScreen
 
 # Implicit export to evade import problems
 __all__ = ["PlaylistSelectionScreen"]
 
-
 class PlaylistSelectionScreen(customtkinter.CTkFrame):
-    def __init__(self, master, spotify_client, on_playlist_selected):
+    def __init__(self, master, spotify_client):
         super().__init__(master)
         self.spotify_client = spotify_client
-        self.on_playlist_selected = on_playlist_selected
         self.grid(sticky="nsew")
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=1)
@@ -72,21 +69,6 @@ class PlaylistSelectionScreen(customtkinter.CTkFrame):
             btn.grid(row=idx//3, column=idx % 3, pady=5, padx=5, sticky="nsew")
 
     def show_playlist_detail(self, playlist_id):
-        self.grid_remove()
-
-        detail_screen = PlaylistDetailScreen(
-            master=self.master,
-            playlist_id=playlist_id,
-            spotify_client=self.spotify_client,
-            on_back=self.show_playlist_selection
-        )
-        detail_screen.grid(row=0, column=0, sticky="nsew")
-        self.master.grid_rowconfigure(0, weight=1)
-        self.master.grid_columnconfigure(0, weight=1)
-
-    def show_playlist_selection(self):
-        for widget in self.master.winfo_children():
-            if isinstance(widget, PlaylistDetailScreen):
-                widget.destroy()
-        self.grid()
-        self.lift()
+        if hasattr(self.master, 'show_playlist_detail'):
+            self.master.show_playlist_detail(playlist_id)
+            
