@@ -23,7 +23,7 @@ class PlaylistSelectionScreen(customtkinter.CTkFrame):
         label.grid(row=0, column=0, pady=20, sticky="n")
 
         container = customtkinter.CTkScrollableFrame(self)
-        container.grid(row=1, column=0, sticky="nsew", padx=10, pady=(0, 10))
+        container.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
 
         for i in range(3):
             container.columnconfigure(i, weight=1)
@@ -63,8 +63,7 @@ class PlaylistSelectionScreen(customtkinter.CTkFrame):
                 fg_color="transparent",
                 hover=True,
                 compound="left",
-                command=lambda pl_id=playlist["id"]: self.show_playlist_detail(
-                    pl_id)
+                command=lambda playlist=playlist: self.show_playlist_detail(playlist)
             )
             btn.grid(row=idx//3, column=idx % 3, pady=5, padx=5, sticky="nsew")
 
