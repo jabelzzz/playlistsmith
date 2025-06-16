@@ -34,7 +34,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/playlistsmith.git
+   git clone https://github.com/jabelzzz/playlistsmith.git
    cd playlistsmith
    ```
 
