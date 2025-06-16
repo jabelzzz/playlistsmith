@@ -3,7 +3,15 @@ import customtkinter
 __all__ = ["LoadingScreen"]
 
 class LoadingScreen(customtkinter.CTkFrame):
+    """A full-screen loading indicator with a message and progress bar."""
+    
     def __init__(self, master, message="Loading..."):
+        """Initialize the loading screen.
+        
+        Args:
+            master: The parent widget.
+            message (str, optional): The message to display. Defaults to "Loading...".
+        """
         super().__init__(master)
         self.grid(row=0, column=0, sticky="nsew")
 
@@ -15,7 +23,7 @@ class LoadingScreen(customtkinter.CTkFrame):
         container = customtkinter.CTkFrame(self, fg_color="transparent")
         container.grid(row=0, column=0, sticky="ns")
 
-        # Add a loading indicator
+        # Add a loading label with the message
         self.loading_label = customtkinter.CTkLabel(
             container,
             text=message,
@@ -27,7 +35,9 @@ class LoadingScreen(customtkinter.CTkFrame):
         self.progress = customtkinter.CTkProgressBar(
             container,
             mode="indeterminate",
-            width=200
+            width=200,
+            fg_color=("gray85", "gray25"),  # Light gray in light mode, dark gray in dark mode
+            progress_color="#7FFFD4"
         )
         self.progress.pack(pady=10)
         self.progress.start()
@@ -37,7 +47,10 @@ class LoadingScreen(customtkinter.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
 
     def destroy(self):
-        # Stop the animation before destroying
+        """Stop the progress animation and destroy the widget.
+        
+        Overrides the default destroy method to ensure proper cleanup.
+        """
         if hasattr(self, 'progress'):
             self.progress.stop()
         super().destroy()
