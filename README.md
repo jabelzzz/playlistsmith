@@ -74,7 +74,7 @@
 4. **Set up Spotify credentials**
    - Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
    - Add `http://localhost:8888/callback` as a Redirect URI in your app settings
-   - Create a `.env` file in the project root with:
+   - Create a `config.env` file in the project root with:
      ```
      SPOTIPY_CLIENT_ID=your_client_id
      SPOTIPY_CLIENT_SECRET=your_client_secret

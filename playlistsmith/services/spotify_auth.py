@@ -19,7 +19,7 @@ for possible_path in [
         break
 
 if not CONFIG_PATH:
-    print("Error: Configuration file config.env not found")
+    print("Error: Configuration file config.env not found, please create a 'config.env' file in the root directory")
     sys.exit(1)
 
 
