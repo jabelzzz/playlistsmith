@@ -85,7 +85,7 @@
 
 1. **Start the application**
    ```bash
-   python -m playlistsmith
+   python main.py
    ```
 
 2. **Log in with Spotify**
