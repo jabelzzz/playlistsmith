@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+tkinter = "*"
 customtkinter = "*"
 python-dotenv = "*"
 dotenv = "*"
