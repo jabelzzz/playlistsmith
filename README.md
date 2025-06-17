@@ -60,13 +60,16 @@
 
    If you used venv:
    ```bash
-   pip install -r requirements.txt
+   pip install pipenv
+   pipenv install --dev
    ```
 
-   If you used pipenv:
+   If you used pipenv directly:
    ```bash
-   pipenv install -r requirements.txt
+   pipenv install --dev
    ```
+
+   This will install all the necessary dependencies, including development ones.
 
 4. **Set up Spotify credentials**
    - Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
@@ -108,7 +111,7 @@
 - **Spotify API**: Spotipy
 - **Image Handling**: Pillow (PIL)
 - **Environment Variables**: python-dotenv
-- **Dependency Management**: pip
+- **Dependency Management**: Pipenv
 
 ## 📁 Project Structure
 
@@ -124,8 +127,9 @@ playlistsmith/
 │   │   └── main_window.py   # Main window
 │   └── __init__.py
 ├── .env.example             # Configuration example
-├── main.py                  # Entry point
-└── requirements.txt         # Dependencies
+├── Pipfile                  # Dependencies (Pipenv)
+├── Pipfile.lock             # Lock file for reproducible builds
+└── main.py                  # Entry point
 ```
 
 ## 🤝 Contributing
