@@ -1,57 +1,75 @@
 import customtkinter
 from playlistsmith.services.spotify_auth import authenticate_spotify
 
-__all__ = ["LoginScreen"]
-
-class LoginScreen(customtkinter.CTk):
+class LoginScreen(customtkinter.CTkFrame):
     """Login screen for Spotify authentication."""
     
-    def __init__(self):
+    def __init__(self, parent):
         """Initialize the login screen with UI elements."""
-        super().__init__()
+        super().__init__(parent)
+        self.parent = parent
 
-        self.title("PlaylistSmith")
-        self.geometry("400x300")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
-        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # Welcome message
         self.label = customtkinter.CTkLabel(
-            self, 
-            text="Please log in to Spotify to continue", 
-            font=("Arial", 16)
+            self,
+            text="Welcome to PlaylistSmith\n\nSign in with Spotify to continue", 
+            font=("Arial", 16),
+            justify="center"
         )
-        self.label.grid(row=0, column=0, padx=20, pady=(20, 10))
+        self.label.grid(row=0, column=0, padx=20, pady=(40, 20))
 
         # Login button
         self.login_button = customtkinter.CTkButton(
             self,
-            text="Login with Spotify",
+            text="Sign in with Spotify",
             command=self.login,
+            font=("Arial", 14),
+            height=40,
+            width=200
         )
-        self.login_button.grid(row=3, column=0, padx=20, pady=(10, 20))
+        self.login_button.grid(row=1, column=0, padx=20, pady=10)
+
+        # Status label
+        self.status_label = customtkinter.CTkLabel(
+            self,
+            text="",
+            text_color="gray"
+        )
+        self.status_label.grid(row=2, column=0, padx=20, pady=10)
 
     def login(self):
-        """Handle the login button click event.
+        """Handle login button click event."""
+        self.login_button.configure(state="disabled")
+        self.status_label.configure(text="Connecting to Spotify...", text_color="white")
         
-        Initiates Spotify authentication and proceeds to the main application
-        if successful.
-        """
-        print("Attempting to authenticate with Spotify...")
-        spotify_client = authenticate_spotify()
-        print("Spotify client:", spotify_client)
-        if spotify_client:
-            print("Spotify authentication successful, proceeding to main window")
-            self.destroy()
-        else:
-            print("Spotify authentication failed")
-
-    def on_closing(self):
-        """Handle the window close event.
-        
-        Ensures the application exits cleanly when the window is closed.
-        """
-        print("Closing the application...")
-        self.destroy()
-        exit()
+        # Use after to prevent UI freezing
+        self.after(100, self._perform_authentication)
+    
+    def _perform_authentication(self):
+        """Perform Spotify authentication."""
+        try:
+            spotify_client = authenticate_spotify()
+            if spotify_client:
+                self.status_label.configure(
+                    text="Authentication successful!", 
+                    text_color="lightgreen"
+                )
+                # Notify parent about successful login
+                if hasattr(self.parent, 'on_login_success'):
+                    self.parent.after(1000, lambda: self.parent.on_login_success(spotify_client))
+            else:
+                self.status_label.configure(
+                    text="Authentication failed. Please try again.", 
+                    text_color="#ff6b6b"
+                )
+                self.login_button.configure(state="normal")
+                
+        except Exception as e:
+            self.status_label.configure(
+                text=f"Error: {str(e)}", 
+                text_color="#ff6b6b"
+            )
+            self.login_button.configure(state="normal")

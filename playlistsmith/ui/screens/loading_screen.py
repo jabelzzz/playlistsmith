@@ -1,56 +1,56 @@
 import customtkinter
 
-__all__ = ["LoadingScreen"]
-
 class LoadingScreen(customtkinter.CTkFrame):
     """A full-screen loading indicator with a message and progress bar."""
     
-    def __init__(self, master, message="Loading..."):
+    def __init__(self, parent, message="Loading..."):
         """Initialize the loading screen.
         
         Args:
-            master: The parent widget.
-            message (str, optional): The message to display. Defaults to "Loading...".
+            parent: Parent widget
+            message: Message to display while loading
         """
-        super().__init__(master)
-        self.grid(row=0, column=0, sticky="nsew")
-
-        # Configure the grid
-        self.grid_rowconfigure(0, weight=1)
+        super().__init__(parent)
+        self.parent = parent
+        
+        # Configure grid
         self.grid_columnconfigure(0, weight=1)
-
-        # Container to center the content
-        container = customtkinter.CTkFrame(self, fg_color="transparent")
-        container.grid(row=0, column=0, sticky="ns")
-
-        # Add a loading label with the message
-        self.loading_label = customtkinter.CTkLabel(
-            container,
+        self.grid_rowconfigure(0, weight=1)
+        
+        # Create container frame
+        self.container = customtkinter.CTkFrame(self)
+        self.container.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
+        
+        # Loading message
+        self.message_label = customtkinter.CTkLabel(
+            self.container,
             text=message,
             font=("Arial", 16)
         )
-        self.loading_label.pack(pady=20)
-
-        # Add an indeterminate progress bar
-        self.progress = customtkinter.CTkProgressBar(
-            container,
-            mode="indeterminate",
-            width=200,
-            fg_color=("gray85", "gray25"),  # Light gray in light mode, dark gray in dark mode
-            progress_color="#7FFFD4"
-        )
-        self.progress.pack(pady=10)
-        self.progress.start()
-
-        # Ensure it takes up all the space
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-
-    def destroy(self):
-        """Stop the progress animation and destroy the widget.
+        self.message_label.pack(pady=(0, 20))
         
-        Overrides the default destroy method to ensure proper cleanup.
+        # Progress bar
+        self.progress = customtkinter.CTkProgressBar(
+            self.container,
+            mode="indeterminate",
+            fg_color=("gray85", "gray25"),
+            progress_color="#7FFFD4",
+            width=300
+        )
+        self.progress.pack(pady=(0, 20))
+        self.progress.start()
+    
+    def set_message(self, message):
+        """Update the loading message.
+        
+        Args:
+            message: New message to display
         """
-        if hasattr(self, 'progress'):
-            self.progress.stop()
-        super().destroy()
+        self.message_label.configure(text=message)
+    
+    def _on_cancel(self):
+        """Handle cancel button click."""
+        self.progress.stop()
+        self.destroy()
+        if hasattr(self.parent, 'on_cancel_loading'):
+            self.parent.on_cancel_loading()

@@ -4,9 +4,6 @@ import os
 from PIL import Image
 import customtkinter
 
-# Implicit export to avoid import problems
-__all__ = ["PlaylistSelectionScreen"]
-
 class PlaylistSelectionScreen(customtkinter.CTkFrame):
     """A screen that displays a grid of the user's Spotify playlists for selection."""
     

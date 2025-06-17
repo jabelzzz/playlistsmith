@@ -1,7 +1,8 @@
 import os
+import webbrowser
 import sys
 import spotipy
-import webbrowser
+
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 from playlistsmith.utils.http_handler import start_http_server
@@ -19,7 +20,7 @@ for possible_path in [
         break
 
 if not CONFIG_PATH:
-    print("Error: Configuration file config.env not found, please create a 'config.env' file in the root directory")
+    print("Error: Configuration file 'config.env' not found, please create a 'config.env' file in the root directory")
     sys.exit(1)
 
 
