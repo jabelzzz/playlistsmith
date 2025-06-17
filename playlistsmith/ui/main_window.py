@@ -5,83 +5,65 @@ from PIL import Image, ImageTk
 from playlistsmith.ui.screens.playlist_selection_screen import PlaylistSelectionScreen
 from playlistsmith.ui.screens.playlist_detail_screen import PlaylistDetailScreen
 from playlistsmith.ui.screens.loading_screen import LoadingScreen
+from playlistsmith.ui.screens.login_screen import LoginScreen
+
 
 class MainWindow(customtkinter.CTk):
-    def __init__(self, spotify_client):
-        """Initialize the main application window.
-        
-        Args:
-            spotify_client: An instance of the Spotify client for API interactions.
-        """
+    def __init__(self):
+        """Initialize the main application window."""
         super().__init__()
-        
-        self.spotify_client = spotify_client
+
+        self.spotify_client = None
         self.title("PlaylistSmith")
-        
-        # Window configuration
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.geometry("1000x700")
         self.minsize(1000, 700)
         self.maxsize(1000, 700)
         self.resizable(False, False)
-        
+
         # Load the app icon
         self._load_app_icon()
-        
+
         # Grid configuration
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.current_screen = None
         self.loading_screen = None
-        
-        # Show the playlist selection screen
-        self.show_playlist_selection()
-        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        # Login into spotify
+        if self.spotify_client:
+            self._load_playlist_selection()
+        else:
+            self._load_login()
 
     def _load_app_icon(self):
         """Load the application icon from the assets directory.
-        
+
         The icon is loaded differently depending on the operating system.
         """
         try:
             current_dir = os.path.dirname(os.path.abspath(__file__))
             project_root = os.path.dirname(os.path.dirname(current_dir))
-            icon_path = os.path.join(project_root, "playlistsmith/assets", "ps_icon.ico")
-            
+            icon_path = os.path.join(
+                project_root, "playlistsmith/assets", "ps_icon.ico")
+
             img = Image.open(icon_path)
-            
+
             if platform.system() == 'Windows':
                 self.iconbitmap(icon_path)
             else:  # For macOS and Linux
                 photo = ImageTk.PhotoImage(img)
                 self.tk.call('wm', 'iconphoto', self._w, photo)
-                
+
             print("Application icon loaded successfully")
-            
+
         except Exception as e:
             print(f"Error loading icon: {e}")
             print(f"Error type: {type(e).__name__}")
 
-    def _show_loading(self, message="Loading..."):
-        """Display a loading screen with the specified message.
-        
-        Args:
-            message (str): The message to display on the loading screen.
-        """
-        if self.loading_screen:
-            self.loading_screen.destroy()
-        self.loading_screen = LoadingScreen(self, message)
-        self.loading_screen.grid(row=0, column=0, sticky="nsew")
-        self.update()  # Force the UI update
-
-    def _hide_loading(self):
-        """Hide the currently displayed loading screen."""
-        if self.loading_screen:
-            self.loading_screen.destroy()
-            self.loading_screen = None
-
     def _setup_screen(self, screen):
         """Configure and display a new screen.
-        
+
         Args:
             screen: The screen widget to be displayed.
         """
@@ -91,6 +73,32 @@ class MainWindow(customtkinter.CTk):
         self.current_screen.grid(row=0, column=0, sticky="nsew")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
+
+    def show_login_screen(self):
+        """Load and display the login screen."""
+        self._show_loading("Loading login screen...")
+        self.after(100, self._load_login)
+
+    def _load_login(self):
+        """Load and display the login screen."""
+        try:
+            screen = LoginScreen(self)
+            self._setup_screen(screen)
+        finally:
+            self._hide_loading()
+
+    def on_login_success(self, spotify_client):
+        """Se llama cuando el login es exitoso."""
+        self.spotify_client = spotify_client
+        self._load_playlist_selection()
+
+    def set_spotify_client(self, spotify_client):
+        """Set the Spotify client for the main window.
+
+        Args:
+            spotify_client: An instance of the Spotify client for API interactions.
+        """
+        self.spotify_client = spotify_client
 
     def show_playlist_selection(self):
         """Display the playlist selection screen with a loading indicator."""
@@ -107,7 +115,7 @@ class MainWindow(customtkinter.CTk):
 
     def show_playlist_detail(self, playlist):
         """Display the playlist detail screen for the specified playlist.
-        
+
         Args:
             playlist: The playlist object containing details to display.
         """
@@ -116,7 +124,7 @@ class MainWindow(customtkinter.CTk):
 
     def _load_playlist_detail(self, playlist):
         """Load and display the detail view for a specific playlist.
-        
+
         Args:
             playlist: The playlist object to display details for.
         """
@@ -130,6 +138,24 @@ class MainWindow(customtkinter.CTk):
             self._setup_screen(screen)
         finally:
             self._hide_loading()
+
+    def _show_loading(self, message="Loading..."):
+        """Display a loading screen with the specified message.
+
+        Args:
+            message (str): The message to display on the loading screen.
+        """
+        if self.loading_screen:
+            self.loading_screen.destroy()
+        self.loading_screen = LoadingScreen(self, message)
+        self.loading_screen.grid(row=0, column=0, sticky="nsew")
+        self.update()  # Force the UI update
+
+    def _hide_loading(self):
+        """Hide the currently displayed loading screen."""
+        if self.loading_screen:
+            self.loading_screen.destroy()
+            self.loading_screen = None
 
     def on_closing(self):
         """Handle the window close event by cleaning up resources and exiting the application."""
