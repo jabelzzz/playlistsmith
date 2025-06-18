@@ -38,15 +38,9 @@
    cd playlistsmith
    ```
 
-2. **Create a virtual environment (recommended)**
+2. **Create a virtual environment**
 
-   Option A - Using venv (included with Python):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-   ```
-
-   Option B - Using Pipenv (recommended for development):
+   Using Pipenv (recommended for development):
    ```bash
    # Install pipenv if you don't have it
    pip install --user pipenv
@@ -58,17 +52,10 @@
 
 3. **Install dependencies**
 
-   If you used venv:
-   ```bash
-   pip install pipenv
-   pipenv install --dev
-   ```
-
-   If you used pipenv directly:
    ```bash
    pipenv install --dev
    ```
-
+   
    This will install all the necessary dependencies, including development ones.
 
 4. **Set up Spotify credentials**
