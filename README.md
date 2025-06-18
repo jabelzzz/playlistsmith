@@ -76,14 +76,14 @@
    - Add `http://127.0.0.1:8888/callback` as a Redirect URI in your app settings (You can use other port if you want)
    ![Texto alternativo](playlistsmith/assets/redirect_uri.png)
    - Create a `config.env` file in the project root with:
-      - You can find you Client_ID and Client_secret at the start of the app
-      ![Client IDs](playlistsmith/assets/client_ids.png)
      ```
      SPOTIPY_CLIENT_ID=your_client_id
      SPOTIPY_CLIENT_SECRET=your_client_secret
      SPOTIPY_REDIRECT_URI=http://127.0.0.1:8888/callback
      ```
-
+     - You can find you Client_ID and Client_secret at the start of the app
+      ![Client IDs](playlistsmith/assets/client_ids.png)
+     
 ## 🎮 How to Use
 
 1. **Start the application**
