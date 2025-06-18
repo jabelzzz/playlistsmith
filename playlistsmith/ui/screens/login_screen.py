@@ -29,7 +29,7 @@ class LoginScreen(customtkinter.CTkFrame):
 
         self.login_button = customtkinter.CTkButton(
             self.content_frame,
-            text="Sign in with Spotify",
+            text="Login with Spotify",
             command=self.login,
             font=("Arial", 14),
             fg_color="#7FFFD4",

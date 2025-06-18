@@ -52,7 +52,7 @@
    pip install --user pipenv
    
    # Create and activate the virtual environment
-   pipenv --python 3.10  # Make sure to use the correct Python version
+   pipenv --python 3.10  # Make sure to use the Python >=3.10
    pipenv shell  # Activate the virtual environment
    ```
 
@@ -73,12 +73,15 @@
 
 4. **Set up Spotify credentials**
    - Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
-   - Add `http://localhost:8888/callback` as a Redirect URI in your app settings
+   - Add `http://127.0.0.1:8888/callback` as a Redirect URI in your app settings (You can use other port if you want)
+   ![Texto alternativo](playlistsmith/assets/redirect_uri.png)
    - Create a `config.env` file in the project root with:
+      - You can find you Client_ID and Client_secret at the start of the app
+      ![Client IDs](playlistsmith/assets/client_ids.png)
      ```
      SPOTIPY_CLIENT_ID=your_client_id
      SPOTIPY_CLIENT_SECRET=your_client_secret
-     SPOTIPY_REDIRECT_URI=http://localhost:8888/callback
+     SPOTIPY_REDIRECT_URI=http://127.0.0.1:8888/callback
      ```
 
 ## 🎮 How to Use
