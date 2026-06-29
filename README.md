@@ -59,8 +59,8 @@
 
    Example:
    ```bash
-   export SPOTIPY_CLIENT_ID=60d0f03374bb4bb0b0b8bd881391849b
-   export SPOTIPY_CLIENT_SECRET=7bf6c60cb3564edca74bdec1a248908f
+   export SPOTIPY_CLIENT_ID=12345
+   export SPOTIPY_CLIENT_SECRET=123144
    export SPOTIPY_REDIRECT_URI=http://localhost:8000/callback
    export COOKIE_SECURE=false
    docker compose up -d --build

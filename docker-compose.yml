@@ -12,7 +12,8 @@ services:
       - HOST=0.0.0.0
       - SPOTIPY_CLIENT_ID=${SPOTIPY_CLIENT_ID}
       - SPOTIPY_CLIENT_SECRET=${SPOTIPY_CLIENT_SECRET}
-      - SPOTIPY_REDIRECT_URI=${SPOTIPY_REDIRECT_URI:-http://localhost:8000/callback}
+      # Use your public callback by default in production. Override with env as needed.
+      - SPOTIPY_REDIRECT_URI=${SPOTIPY_REDIRECT_URI:-https://playlistsmith.jabel.tech/callback}
       - COOKIE_SECURE=${COOKIE_SECURE:-false}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]

@@ -28,21 +28,50 @@ COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() in ("1", "true", "ye
 SESSION_STORE: dict[str, dict] = {}
 
 
-def get_sp_oauth():
+def get_sp_oauth(request: Request):
+    """Return a SpotifyOAuth configured for this request.
+
+    If `SPOTIPY_REDIRECT_URI` is not provided or points to localhost while the
+    incoming request is not local, prefer a redirect URI built from the
+    request (request.url_for("callback")). This helps deployments behind a
+    proxy where the default docker-compose value points to localhost.
+    Note: the redirect URI used here must also be registered in your Spotify
+    application settings for OAuth to succeed in production.
+    """
     client_id = os.getenv("SPOTIPY_CLIENT_ID")
     client_secret = os.getenv("SPOTIPY_CLIENT_SECRET")
-    redirect_uri = os.getenv("SPOTIPY_REDIRECT_URI")
+    redirect_uri_env = os.getenv("SPOTIPY_REDIRECT_URI")
+
     missing = [name for name, value in (
         ("SPOTIPY_CLIENT_ID", client_id),
         ("SPOTIPY_CLIENT_SECRET", client_secret),
-        ("SPOTIPY_REDIRECT_URI", redirect_uri),
     ) if not value]
+
     if missing:
         raise HTTPException(
             status_code=500,
             detail=f"Spotify credentials missing: {', '.join(missing)}"
         )
-    return SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri,
+
+    # Prefer explicit env var when it's provided and not obviously a local-only value.
+    final_redirect = None
+    try:
+        if redirect_uri_env:
+            # If env var points to localhost but the incoming request host is not
+            # localhost, override to use the app's public callback URL built
+            # from the incoming request. This avoids redirecting browsers back
+            # to the client's localhost when the server runs remotely.
+            if "localhost" in redirect_uri_env and request.url.hostname not in ("localhost", "127.0.0.1"):
+                final_redirect = str(request.url_for("callback"))
+            else:
+                final_redirect = redirect_uri_env
+        else:
+            final_redirect = str(request.url_for("callback"))
+    except Exception:
+        # Fallback to env var if building from request fails for any reason
+        final_redirect = redirect_uri_env or "http://localhost:8000/callback"
+
+    return SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=final_redirect,
                         scope="user-library-read playlist-modify-public playlist-modify-private")
 
 
@@ -103,7 +132,7 @@ def _get_spotify_client(request: Request):
     expires_at = token_info.get("expires_at")
 
     if expires_at and int(time.time()) > expires_at - 60:
-        sp_oauth = get_sp_oauth()
+        sp_oauth = get_sp_oauth(request)
         refresh_token = token_info.get("refresh_token")
         if not refresh_token:
             raise HTTPException(status_code=401, detail="Session expired")
