@@ -11,16 +11,15 @@ const methodButtons = Array.from(document.querySelectorAll('.method-btn'))
 const orderSelect = document.getElementById('sort-direction')
 
 const state = {
-  token: sessionStorage.getItem('spotify_token') || null,
+  authenticated: false,
   selectedPlaylist: null,
   playlists: []
 }
 
 function updateAuthUi() {
-  const isLoggedIn = Boolean(state.token)
-  loginBtn?.classList.toggle('hidden', isLoggedIn)
-  logoutBtn?.classList.toggle('hidden', !isLoggedIn)
-  authStatus.textContent = isLoggedIn
+  loginBtn?.classList.toggle('hidden', state.authenticated)
+  logoutBtn?.classList.toggle('hidden', !state.authenticated)
+  authStatus.textContent = state.authenticated
     ? 'Signed in. Loading your playlists…'
     : 'Connect your Spotify account to browse playlists.'
 }
@@ -80,20 +79,15 @@ function renderPlaylists(items) {
 
 // Load the current user's playlists and show them immediately after login.
 async function listPlaylists() {
-  const token = sessionStorage.getItem('spotify_token')
-  if (!token) {
-    alert('Please login first')
-    return
-  }
-
-  state.token = token
   authStatus.textContent = 'Loading playlists...'
   const res = await fetch('/playlists', {
-    headers: { Authorization: `Bearer ${token}` }
+    credentials: 'same-origin'
   })
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))
+    state.authenticated = false
+    updateAuthUi()
     authStatus.textContent = 'Unable to load playlists.'
     alert(`Error listing playlists: ${err.detail || res.status}`)
     return
@@ -113,17 +107,16 @@ async function listPlaylists() {
 
 // Reorder the selected playlist without deleting any tracks; only the order changes.
 async function sortPlaylist(playlistId, method, direction) {
-  const token = sessionStorage.getItem('spotify_token')
-  if (!token) {
+  if (!state.authenticated) {
     alert('Please login first')
     return
   }
 
   const res = await fetch('/sort', {
     method: 'POST',
+    credentials: 'same-origin',
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({ playlist_id: playlistId, method, direction })
   })
@@ -139,17 +132,16 @@ async function sortPlaylist(playlistId, method, direction) {
 
 // Remove duplicate tracks while preserving the first copy of each song.
 async function removeDuplicates(playlistId) {
-  const token = sessionStorage.getItem('spotify_token')
-  if (!token) {
+  if (!state.authenticated) {
     alert('Please login first')
     return
   }
 
   const res = await fetch('/remove_duplicates', {
     method: 'POST',
+    credentials: 'same-origin',
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({ playlist_id: playlistId })
   })
@@ -167,9 +159,12 @@ loginBtn?.addEventListener('click', () => {
   window.location.href = '/login'
 })
 
-logoutBtn?.addEventListener('click', () => {
-  sessionStorage.removeItem('spotify_token')
-  state.token = null
+logoutBtn?.addEventListener('click', async () => {
+  await fetch('/logout', {
+    method: 'POST',
+    credentials: 'same-origin'
+  })
+  state.authenticated = false
   state.selectedPlaylist = null
   state.playlists = []
   renderPlaylists([])
@@ -193,10 +188,24 @@ methodButtons.forEach((button) => {
   })
 })
 
-function initializeApp() {
+async function checkAuthStatus() {
+  const res = await fetch('/auth/status', {
+    credentials: 'same-origin'
+  })
+  if (!res.ok) {
+    state.authenticated = false
+    updateAuthUi()
+    return false
+  }
+  state.authenticated = true
   updateAuthUi()
+  return true
+}
+
+async function initializeApp() {
+  state.authenticated = await checkAuthStatus()
   updateSelectionUi()
-  if (state.token) {
+  if (state.authenticated) {
     void listPlaylists()
   }
 }

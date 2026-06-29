@@ -8,20 +8,25 @@ This module exposes FastAPI endpoints for:
 
 Each endpoint delegates to functions in `playlistsmith.services`.
 """
-from fastapi import APIRouter, Request, Depends, HTTPException
-from fastapi.responses import RedirectResponse, JSONResponse, HTMLResponse
-from dotenv import load_dotenv
-import os
 import json
+import os
+import time
+from uuid import uuid4
+
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+from dotenv import load_dotenv
+from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi.responses import RedirectResponse, JSONResponse
 from pydantic import BaseModel
+from spotipy.oauth2 import SpotifyOAuth
 
 from playlistsmith.services.sort_playlist import PlaylistSorter
 
 router = APIRouter()
 
 load_dotenv("config.env")
+
+SESSION_STORE: dict[str, dict] = {}
 
 
 def get_sp_oauth():
@@ -43,52 +48,87 @@ def login(sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
 
 @router.get("/callback")
 def callback(request: Request, sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
-        """Handle Spotify redirect and return a small HTML page that stores the access token in sessionStorage.
+    """Handle Spotify redirect and store the token in a server-side session cookie."""
+    code = request.query_params.get("code")
+    if not code:
+        return JSONResponse({"error": "No code provided"}, status_code=400)
 
-        This avoids storing any user tokens on the server and keeps them only in the user's browser session.
-        """
-        code = request.query_params.get("code")
-        if not code:
-                return JSONResponse({"error": "No code provided"}, status_code=400)
-        token_info = sp_oauth.get_access_token(code)
-        access_token = token_info.get("access_token") if token_info else None
-        if not access_token:
-                return JSONResponse({"error": "Failed to obtain access token"}, status_code=500)
+    token_info = sp_oauth.get_access_token(code)
+    access_token = token_info.get("access_token") if token_info else None
+    if not access_token:
+        return JSONResponse({"error": "Failed to obtain access token"}, status_code=500)
 
-        # Safely embed token into JS using json.dumps
-        token_js = json.dumps(access_token)
-        html = f"""
-        <!doctype html>
-        <html>
-            <head><meta charset="utf-8"><title>PlaylistSmith - Callback</title></head>
-            <body>
-                <script>
-                    // Store token only in browser sessionStorage and redirect back to app
-                    sessionStorage.setItem('spotify_token', {token_js});
-                    window.location = '/';
-                </script>
-                <p>If you are not redirected, <a href="/">click here</a>.</p>
-            </body>
-        </html>
-        """
-        return HTMLResponse(content=html)
+    if "expires_at" not in token_info and token_info.get("expires_in"):
+        token_info["expires_at"] = int(time.time()) + int(token_info["expires_in"])
+
+    session_id = str(uuid4())
+    SESSION_STORE[session_id] = token_info
+
+    response = RedirectResponse(url="/")
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=token_info.get("expires_in", 3600),
+        path="/",
+    )
+    return response
 
 
-def _extract_bearer_token(request: Request):
-    auth = request.headers.get('authorization') or request.headers.get('Authorization')
-    if not auth:
+def _get_session_id(request: Request):
+    session_id = request.cookies.get("session_id")
+    if not session_id:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    parts = auth.split()
-    if len(parts) == 2 and parts[0].lower() == 'bearer':
-        return parts[1]
-    raise HTTPException(status_code=400, detail="Invalid authorization header")
+    if session_id not in SESSION_STORE:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    return session_id
+
+
+def _get_spotify_client(request: Request):
+    session_id = _get_session_id(request)
+    token_info = SESSION_STORE[session_id]
+    expires_at = token_info.get("expires_at")
+
+    if expires_at and int(time.time()) > expires_at - 60:
+        sp_oauth = get_sp_oauth()
+        refresh_token = token_info.get("refresh_token")
+        if not refresh_token:
+            raise HTTPException(status_code=401, detail="Session expired")
+
+        new_token_info = sp_oauth.refresh_access_token(refresh_token)
+        if "refresh_token" not in new_token_info:
+            new_token_info["refresh_token"] = refresh_token
+        if "expires_at" not in new_token_info and new_token_info.get("expires_in"):
+            new_token_info["expires_at"] = int(time.time()) + int(new_token_info["expires_in"])
+
+        SESSION_STORE[session_id] = new_token_info
+        token_info = new_token_info
+
+    return spotipy.Spotify(auth=token_info["access_token"])
+
+
+@router.get("/auth/status")
+def auth_status(request: Request):
+    _get_session_id(request)
+    return {"authenticated": True}
+
+
+@router.post("/logout")
+def logout(request: Request):
+    session_id = request.cookies.get("session_id")
+    if session_id:
+        SESSION_STORE.pop(session_id, None)
+    response = JSONResponse({"status": "ok"})
+    response.delete_cookie("session_id", path="/")
+    return response
 
 
 @router.get("/playlists")
 def list_playlists(request: Request):
-    """Return current user's playlists using the Bearer token provided by the client."""
-    token = _extract_bearer_token(request)
-    sp = spotipy.Spotify(auth=token)
+    """Return current user's playlists using the server-side Spotify session."""
+    sp = _get_spotify_client(request)
     results = sp.current_user_playlists(limit=50)
     playlists = []
     for p in results["items"]:
@@ -115,8 +155,7 @@ def sort_playlist(payload: SortRequest, request: Request):
 
     Expects JSON body: {"playlist_id": "id", "method": "artist", "direction": "ascending"|"descending"}
     """
-    token = _extract_bearer_token(request)
-    sp = spotipy.Spotify(auth=token)
+    sp = _get_spotify_client(request)
     sorter = PlaylistSorter(sp, payload.playlist_id)
     reverse = payload.direction.lower() == "descending"
     if payload.method == "artist":
@@ -139,8 +178,7 @@ class RemoveDuplicatesRequest(BaseModel):
 @router.post("/remove_duplicates")
 def remove_duplicates(payload: RemoveDuplicatesRequest, request: Request):
     """Remove duplicate tracks from a playlist while preserving the first occurrence."""
-    token = _extract_bearer_token(request)
-    sp = spotipy.Spotify(auth=token)
+    sp = _get_spotify_client(request)
     sorter = PlaylistSorter(sp, payload.playlist_id)
     sorter.remove_duplicates()
     return {"status": "ok"}
