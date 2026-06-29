@@ -11,6 +11,7 @@ spotipy = "*"
 requests = "*"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
+gunicorn = "*"
 
 [dev-packages]
 
