@@ -1,11 +1,8 @@
 import os
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-from dotenv import load_dotenv
 from playlistsmith.api import router as api_router
 from fastapi.staticfiles import StaticFiles
-
-load_dotenv("config.env")
 
 app = FastAPI(title="PlaylistSmith SaaS", version="0.1.0")
 app.include_router(api_router)

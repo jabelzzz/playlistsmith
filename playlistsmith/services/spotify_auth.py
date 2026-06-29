@@ -4,47 +4,20 @@ import sys
 import spotipy
 
 from spotipy.oauth2 import SpotifyOAuth
-from dotenv import load_dotenv
 from playlistsmith.utils.http_handler import start_http_server
-
-# Search for the configuration file in different locations
-CONFIG_PATH = None
-for possible_path in [
-    "config.env",  # Current directory
-    os.path.join(
-        os.path.dirname(__file__), "..", "..", "config.env"
-    ),  # Parent directory
-]:
-    if os.path.exists(possible_path):
-        CONFIG_PATH = possible_path
-        break
-
-if not CONFIG_PATH:
-    print("Error: Configuration file 'config.env' not found, please create a 'config.env' file in the root directory")
-    sys.exit(1)
 
 
 def validate_spotify_credentials():
-    """Validate Spotify credentials from config file."""
-    try:
-        # Load environment variables from .env file
-        load_dotenv(CONFIG_PATH)
+    """Validate Spotify credentials from environment variables."""
+    client_id = os.getenv("SPOTIPY_CLIENT_ID")
+    client_secret = os.getenv("SPOTIPY_CLIENT_SECRET")
+    redirect_uri = os.getenv("SPOTIPY_REDIRECT_URI")
 
-        # Validate credentials
-        client_id = os.getenv("SPOTIPY_CLIENT_ID")
-        client_secret = os.getenv("SPOTIPY_CLIENT_SECRET")
-        redirect_uri = os.getenv("SPOTIPY_REDIRECT_URI")
-
-        if not all([client_id, client_secret, redirect_uri]):
-            print("Error: Missing Spotify credentials in config.env")
-            sys.exit(1)
-
-        return client_id, client_secret, redirect_uri
-
-    except Exception as e:
-        print(f"Error: {e}")
-        print("Please follow the setup instructions")
+    if not all([client_id, client_secret, redirect_uri]):
+        print("Error: Missing Spotify credentials. Set SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, and SPOTIPY_REDIRECT_URI.")
         sys.exit(1)
+
+    return client_id, client_secret, redirect_uri
 
 
 def authenticate_spotify(

@@ -55,18 +55,15 @@
 
 3. **Configure Spotify credentials**
 
-   Create a `config.env` file in the project root from the example:
-   ```bash
-   cp config.env.example config.env
-   ```
+   Set the required Spotify environment variables in `docker-compose.yml` or in your shell before running Docker Compose.
 
-   Then edit `config.env` and set your values:
-   ```env
-   SPOTIPY_CLIENT_ID=your_spotify_client_id
-   SPOTIPY_CLIENT_SECRET=your_spotify_client_secret
-   SPOTIPY_REDIRECT_URI=http://localhost:8000/callback
-   PORT=8000
-   HOST=0.0.0.0
+   Example values to set in `docker-compose.yml`:
+   ```yaml
+   environment:
+     SPOTIPY_CLIENT_ID: your_spotify_client_id
+     SPOTIPY_CLIENT_SECRET: your_spotify_client_secret
+     SPOTIPY_REDIRECT_URI: http://localhost:8000/callback
+     COOKIE_SECURE: false
    ```
 
    - Register an app at the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
@@ -140,8 +137,8 @@ playlistsmith/
 
 ## 💡 Notes
 
-- Use `config.env.example` as a starting point for your local Spotify credentials.
-- The application uses client-side session storage for the Spotify token and does not persist user tokens on the server.
+- All Spotify credentials and session options must be configured through `docker-compose.yml`.
+- The application stores the Spotify access token server-side and does not expose it to browser storage.
 
 ## 🤝 Contributing
 

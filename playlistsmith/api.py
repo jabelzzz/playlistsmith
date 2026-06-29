@@ -24,8 +24,7 @@ from playlistsmith.services.sort_playlist import PlaylistSorter
 
 router = APIRouter()
 
-load_dotenv("config.env")
-
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() in ("1", "true", "yes")
 SESSION_STORE: dict[str, dict] = {}
 
 
@@ -69,8 +68,8 @@ def callback(request: Request, sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
         key="session_id",
         value=session_id,
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=COOKIE_SECURE,
+        samesite="strict",
         max_age=token_info.get("expires_in", 3600),
         path="/",
     )
