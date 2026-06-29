@@ -32,8 +32,16 @@ def get_sp_oauth():
     client_id = os.getenv("SPOTIPY_CLIENT_ID")
     client_secret = os.getenv("SPOTIPY_CLIENT_SECRET")
     redirect_uri = os.getenv("SPOTIPY_REDIRECT_URI")
-    if not all([client_id, client_secret, redirect_uri]):
-        raise HTTPException(status_code=500, detail="Spotify credentials missing")
+    missing = [name for name, value in (
+        ("SPOTIPY_CLIENT_ID", client_id),
+        ("SPOTIPY_CLIENT_SECRET", client_secret),
+        ("SPOTIPY_REDIRECT_URI", redirect_uri),
+    ) if not value]
+    if missing:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Spotify credentials missing: {', '.join(missing)}"
+        )
     return SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri,
                         scope="user-library-read playlist-modify-public playlist-modify-private")
 
@@ -41,7 +49,7 @@ def get_sp_oauth():
 @router.get("/login")
 def login(sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
     """Redirect the user to Spotify authorization page."""
-    auth_url = sp_oauth.get_authorize_url()
+    auth_url = sp_oauth.get_authorize_url(show_dialog=True)
     return RedirectResponse(auth_url)
 
 
@@ -52,10 +60,14 @@ def callback(request: Request, sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
     if not code:
         return JSONResponse({"error": "No code provided"}, status_code=400)
 
-    token_info = sp_oauth.get_access_token(code)
+    try:
+        token_info = sp_oauth.get_access_token(code)
+    except Exception as exc:
+        return JSONResponse({"error": "Failed to obtain access token", "detail": str(exc)}, status_code=500)
+
     access_token = token_info.get("access_token") if token_info else None
     if not access_token:
-        return JSONResponse({"error": "Failed to obtain access token"}, status_code=500)
+        return JSONResponse({"error": "Failed to obtain access token", "detail": token_info}, status_code=500)
 
     if "expires_at" not in token_info and token_info.get("expires_in"):
         token_info["expires_at"] = int(time.time()) + int(token_info["expires_in"])

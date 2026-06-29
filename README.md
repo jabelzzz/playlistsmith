@@ -55,15 +55,15 @@
 
 3. **Configure Spotify credentials**
 
-   Set the required Spotify environment variables in `docker-compose.yml` or in your shell before running Docker Compose.
+   Pass the required Spotify environment variables to Docker Compose from your shell.
 
-   Example values to set in `docker-compose.yml`:
-   ```yaml
-   environment:
-     SPOTIPY_CLIENT_ID: your_spotify_client_id
-     SPOTIPY_CLIENT_SECRET: your_spotify_client_secret
-     SPOTIPY_REDIRECT_URI: http://localhost:8000/callback
-     COOKIE_SECURE: false
+   Example:
+   ```bash
+   export SPOTIPY_CLIENT_ID=60d0f03374bb4bb0b0b8bd881391849b
+   export SPOTIPY_CLIENT_SECRET=7bf6c60cb3564edca74bdec1a248908f
+   export SPOTIPY_REDIRECT_URI=http://localhost:8000/callback
+   export COOKIE_SECURE=false
+   docker compose up -d --build
    ```
 
    - Register an app at the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).

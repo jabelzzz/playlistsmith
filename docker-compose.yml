@@ -8,12 +8,12 @@ services:
       - "8000:8000"
     restart: unless-stopped
     environment:
-      PORT: 8000
-      HOST: 0.0.0.0
-      SPOTIPY_CLIENT_ID: ${SPOTIPY_CLIENT_ID:-}
-      SPOTIPY_CLIENT_SECRET: ${SPOTIPY_CLIENT_SECRET:-}
-      SPOTIPY_REDIRECT_URI: ${SPOTIPY_REDIRECT_URI:-http://localhost:8000/callback}
-      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      - PORT=8000
+      - HOST=0.0.0.0
+      - SPOTIPY_CLIENT_ID=${SPOTIPY_CLIENT_ID}
+      - SPOTIPY_CLIENT_SECRET=${SPOTIPY_CLIENT_SECRET}
+      - SPOTIPY_REDIRECT_URI=${SPOTIPY_REDIRECT_URI:-http://localhost:8000/callback}
+      - COOKIE_SECURE=${COOKIE_SECURE:-false}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 30s
