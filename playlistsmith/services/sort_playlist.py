@@ -5,6 +5,19 @@ class PlaylistSorter:
     such as artist name, release date, duration, and popularity.
     """
 
+    @staticmethod
+    def _deduplicate_tracks(tracks):
+        """Return tracks in first-seen order while dropping duplicates by URI."""
+        seen = set()
+        deduped = []
+        for track in tracks:
+            uri = track.get("uri")
+            if not uri or uri in seen:
+                continue
+            seen.add(uri)
+            deduped.append(track)
+        return deduped
+
     def __init__(self, spotify_client, playlist_id: str):
         """Initialize the PlaylistSorter with Spotify client and playlist ID.
         
@@ -69,15 +82,14 @@ class PlaylistSorter:
         return all_tracks
 
     def reorder_playlist_in_batches(self, track_uris: list):
-        """Reorder a playlist in batches of 100 tracks.
+        """Reorder a playlist in batches of 100 tracks without removing any songs.
         
-        Args:
-            track_uris (list): List of track URIs in the desired order.
-            
-        Note:
-            Spotify's API has a limit of 100 tracks per request, so this method
-            handles larger playlists by making multiple requests as needed.
+        The method re-creates the playlist contents in the requested order. It does not
+        delete or add additional tracks; it only reorders the existing ones.
         """
+        if not track_uris:
+            return
+
         for index in range(0, len(track_uris), 100):
             batch = track_uris[index: index + 100]
             if index == 0:
@@ -85,6 +97,17 @@ class PlaylistSorter:
                     self.playlist_id, batch)
             else:
                 self.spotify_client.playlist_add_items(self.playlist_id, batch)
+
+    def remove_duplicates(self):
+        """Remove duplicate tracks while preserving the first occurrence of each song."""
+        tracks = self.get_all_tracks()
+        if not tracks:
+            print("No tracks found.")
+            return
+
+        deduped_tracks = self._deduplicate_tracks(tracks)
+        track_uris = [t["uri"] for t in deduped_tracks if t.get("uri")]
+        self.reorder_playlist_in_batches(track_uris)
 
     def sort_by_artist(self, reverse=False):
         """Sort the playlist by artist name.

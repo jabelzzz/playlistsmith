@@ -1,0 +1,234 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0f1115;
+  color: #f5f7fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f1115 0%, #171b24 100%);
+  color: #f5f7fa;
+}
+
+button {
+  font: inherit;
+}
+
+.app-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.topbar,
+.toolbar,
+.playlist-panel,
+.menu-panel {
+  background: rgba(18, 22, 31, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.4rem 1.6rem;
+  gap: 1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.8rem;
+  color: #8bb4ff;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.4rem;
+  margin-top: 1rem;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.playlist-panel,
+.menu-panel {
+  padding: 1.25rem;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.playlist-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #171b24;
+  color: inherit;
+  border-radius: 16px;
+  padding: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.playlist-card:hover,
+.playlist-card.selected {
+  transform: translateY(-2px);
+  border-color: #7aa2ff;
+  background: #202637;
+}
+
+.playlist-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  background: #10131a;
+}
+
+.playlist-info h3 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.playlist-info p {
+  color: #9aa6bd;
+  font-size: 0.92rem;
+}
+
+.method-buttons {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.method-btn,
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.direction-label {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #9aa6bd;
+}
+
+.direction-select {
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #151925;
+  color: #f5f7fa;
+}
+
+.method-btn:hover,
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: #6b8cff;
+  color: white;
+}
+
+.btn-secondary {
+  background: #232a37;
+  color: #f5f7fa;
+}
+
+.method-btn {
+  background: #232a37;
+  color: #f5f7fa;
+}
+
+.method-btn-danger {
+  background: #8a2f2f;
+  color: #fff;
+}
+
+.status {
+  margin-top: 0.75rem;
+  color: #9aa6bd;
+}
+
+.status.muted {
+  color: #c4d0e6;
+}
+
+.empty-state {
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  color: #9aa6bd;
+}
+
+.footer {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+  text-align: center;
+  color: #8e99ac;
+  font-size: 0.95rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 860px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar,
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

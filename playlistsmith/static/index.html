@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PlaylistSmith UI</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PlaylistSmith</p>
+          <h1>Organize your Spotify playlists</h1>
+        </div>
+        <div class="actions">
+          <button id="btn-login" class="btn btn-primary">Login with Spotify</button>
+          <button id="btn-logout" class="btn btn-secondary hidden">Logout</button>
+        </div>
+      </header>
+
+      <section class="toolbar">
+        <p id="auth-status" class="status">Connect your Spotify account to browse playlists.</p>
+      </section>
+
+      <main class="content">
+        <section class="playlist-panel">
+          <div class="panel-heading">
+            <h2>Your playlists</h2>
+            <span id="playlist-count">0 playlists</span>
+          </div>
+          <div id="playlists" class="playlist-grid" aria-live="polite"></div>
+        </section>
+
+        <aside id="menu-panel" class="menu-panel hidden">
+          <h2>Sort options</h2>
+          <p id="selected-playlist-title">Select a playlist to see available methods.</p>
+          <label class="direction-label" for="sort-direction">Order</label>
+          <select id="sort-direction" class="direction-select">
+            <option value="descending">Descending</option>
+            <option value="ascending">Ascending</option>
+          </select>
+          <div class="method-buttons">
+            <button class="method-btn" data-method="artist">By artist</button>
+            <button class="method-btn" data-method="release">By release date</button>
+            <button class="method-btn" data-method="duration">By duration</button>
+            <button class="method-btn" data-method="popularity">By popularity</button>
+            <button class="method-btn method-btn-danger" data-method="remove_duplicates">Remove duplicates</button>
+          </div>
+          <div id="sort-status" class="status muted"></div>
+        </aside>
+      </main>
+    </div>
+
+    <footer class="footer">
+      <p>Made with ❤️ by Jabel Álvarez</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

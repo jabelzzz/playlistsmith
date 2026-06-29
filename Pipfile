@@ -4,13 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-customtkinter = "*"
 python-dotenv = "*"
 dotenv = "*"
 debugpy = "*"
 spotipy = "*"
 requests = "*"
-pillow = "*"
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
 
 [dev-packages]
 

@@ -59,23 +59,27 @@
    This will install all the necessary dependencies, including development ones.
 
 4. **Set up Spotify credentials**
-   - Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
-   - Add `http://127.0.0.1:8888/callback` as a Redirect URI in your app settings (You can use other port if you want)
-   ![Texto alternativo](playlistsmith/assets/redirect_uri.png)
-   - Create a `config.env` file in the project root with:
-     ```
-     SPOTIPY_CLIENT_ID=your_client_id
-     SPOTIPY_CLIENT_SECRET=your_client_secret
-     SPOTIPY_REDIRECT_URI=http://127.0.0.1:8888/callback
-     ```
+    - Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
+    - Add `http://127.0.0.1:8000/callback` as a Redirect URI in your app settings (use this exact URL for local testing)
+    ![Texto alternativo](playlistsmith/assets/redirect_uri.png)
+    - Create a `config.env` file in the project root by copying `config.env.example` and filling values:
+       ```bash
+       cp config.env.example config.env
+       # then edit config.env and paste your SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET
+       ```
      - You can find you Client_ID and Client_secret at the start of the app
       ![Client IDs](playlistsmith/assets/client_ids.png)
      
 ## 🎮 How to Use
 
-1. **Start the application**
+1. **Start the application (simple, recommended for local testing)**
    ```bash
-   python main.py
+   # Install dependencies
+   python3 -m pip install -U pip
+   python3 -m pip install fastapi uvicorn spotipy python-dotenv
+
+   # Run server
+   python3 main.py
    ```
 
 2. **Log in with Spotify**
@@ -121,6 +125,29 @@ playlistsmith/
 ├── Pipfile.lock             # Lock file for reproducible builds
 └── main.py                  # Entry point
 ```
+
+## 🚢 Docker deployment
+
+You can build and run the application using Docker Compose. The image installs dependencies from `Pipfile` so it always checks the declared libraries.
+
+1. Copy your local config and set credentials:
+```bash
+cp config.env.example config.env
+# Edit config.env and add SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET
+```
+
+2. Build and start with Compose:
+```bash
+docker compose build --pull
+docker compose up -d
+```
+
+3. Verify the service:
+```bash
+curl -f http://127.0.0.1:8000/health
+```
+
+By default the service listens on port `8000`. If you registered a different `SPOTIPY_REDIRECT_URI` update `config.env` accordingly.
 
 ## 🤝 Contributing
 
