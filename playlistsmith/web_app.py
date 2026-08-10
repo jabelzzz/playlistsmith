@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from playlistsmith.api import router as api_router
 from fastapi.staticfiles import StaticFiles
 

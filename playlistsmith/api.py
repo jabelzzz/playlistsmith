@@ -76,7 +76,7 @@ def get_sp_oauth(request: Request):
 @router.get("/login")
 def login(sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
     """Redirect the user to Spotify authorization page."""
-    auth_url = sp_oauth.get_authorize_url(show_dialog=True)
+    auth_url = sp_oauth.get_authorize_url()
     return RedirectResponse(auth_url)
 
 
@@ -169,12 +169,15 @@ def logout(request: Request):
 
 @router.get("/playlists")
 def list_playlists(request: Request):
-    """Return current user's playlists using the server-side Spotify session."""
+    """Return playlists owned by the current user (excludes playlists followed from other users)."""
     sp = _get_spotify_client(request)
+    user_id = sp.current_user()["id"]
     results = sp.current_user_playlists(limit=50)
     playlists = []
     while results:
         for p in results.get("items", []):
+            if p.get("owner", {}).get("id") != user_id:
+                continue
             images = p.get("images") or []
             image_url = images[0]["url"] if images else None
             playlists.append({
