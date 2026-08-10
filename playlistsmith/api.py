@@ -22,10 +22,19 @@ from spotipy.oauth2 import SpotifyOAuth
 
 from playlistsmith.services.sort_playlist import PlaylistSorter
 
+load_dotenv()
+
 router = APIRouter()
 
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() in ("1", "true", "yes")
 SESSION_STORE: dict[str, dict] = {}
+SPOTIFY_SCOPE = " ".join((
+    "user-library-read",
+    "playlist-read-private",
+    "playlist-read-collaborative",
+    "playlist-modify-public",
+    "playlist-modify-private",
+))
 
 
 def get_sp_oauth(request: Request):
@@ -53,26 +62,15 @@ def get_sp_oauth(request: Request):
             detail=f"Spotify credentials missing: {', '.join(missing)}"
         )
 
-    # Prefer explicit env var when it's provided and not obviously a local-only value.
-    final_redirect = None
+    # Keep an explicitly configured URI identical across /login and /callback.
     try:
-        if redirect_uri_env:
-            # If env var points to localhost but the incoming request host is not
-            # localhost, override to use the app's public callback URL built
-            # from the incoming request. This avoids redirecting browsers back
-            # to the client's localhost when the server runs remotely.
-            if "localhost" in redirect_uri_env and request.url.hostname not in ("localhost", "127.0.0.1"):
-                final_redirect = str(request.url_for("callback"))
-            else:
-                final_redirect = redirect_uri_env
-        else:
-            final_redirect = str(request.url_for("callback"))
+        final_redirect = redirect_uri_env or str(request.url_for("callback"))
     except Exception:
         # Fallback to env var if building from request fails for any reason
         final_redirect = redirect_uri_env or "http://localhost:8000/callback"
 
     return SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=final_redirect,
-                        scope="user-library-read playlist-modify-public playlist-modify-private")
+                        scope=SPOTIFY_SCOPE)
 
 
 @router.get("/login")
@@ -85,6 +83,10 @@ def login(sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
 @router.get("/callback")
 def callback(request: Request, sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
     """Handle Spotify redirect and store the token in a server-side session cookie."""
+    spotify_error = request.query_params.get("error")
+    if spotify_error:
+        return RedirectResponse(url=f"/static/index.html?login_error={spotify_error}", status_code=303)
+
     code = request.query_params.get("code")
     if not code:
         return JSONResponse({"error": "No code provided"}, status_code=400)
@@ -104,7 +106,7 @@ def callback(request: Request, sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
     session_id = str(uuid4())
     SESSION_STORE[session_id] = token_info
 
-    response = RedirectResponse(url="/")
+    response = RedirectResponse(url="/static/index.html", status_code=303)
     response.set_cookie(
         key="session_id",
         value=session_id,
@@ -171,15 +173,17 @@ def list_playlists(request: Request):
     sp = _get_spotify_client(request)
     results = sp.current_user_playlists(limit=50)
     playlists = []
-    for p in results["items"]:
-        images = p.get("images") or []
-        image_url = images[0]["url"] if images else None
-        playlists.append({
-            "id": p["id"],
-            "name": p["name"],
-            "tracks": p["tracks"]["total"],
-            "image_url": image_url,
-        })
+    while results:
+        for p in results.get("items", []):
+            images = p.get("images") or []
+            image_url = images[0]["url"] if images else None
+            playlists.append({
+                "id": p["id"],
+                "name": p["name"],
+                "tracks": p["tracks"]["total"],
+                "image_url": image_url,
+            })
+        results = sp.next(results) if results.get("next") else None
     return {"items": playlists}
 
 

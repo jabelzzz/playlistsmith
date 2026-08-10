@@ -203,10 +203,14 @@ async function checkAuthStatus() {
 }
 
 async function initializeApp() {
+  const loginError = new URLSearchParams(window.location.search).get("login_error")
   state.authenticated = await checkAuthStatus()
   updateSelectionUi()
   if (state.authenticated) {
     void listPlaylists()
+  } else if (loginError) {
+    history.replaceState({}, "", window.location.pathname)
+    authStatus.textContent = "Spotify login was cancelled or rejected (" + loginError + "). Please try again."
   }
 }
 

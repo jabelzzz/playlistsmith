@@ -12,8 +12,8 @@ services:
       - HOST=0.0.0.0
       - SPOTIPY_CLIENT_ID=${SPOTIPY_CLIENT_ID}
       - SPOTIPY_CLIENT_SECRET=${SPOTIPY_CLIENT_SECRET}
-      # Use your public callback by default in production. Override with env as needed.
-      - SPOTIPY_REDIRECT_URI=${SPOTIPY_REDIRECT_URI:-https://playlistsmith.jabel.tech/callback}
+      # Must exactly match a Redirect URI registered in Spotify's dashboard.
+      - SPOTIPY_REDIRECT_URI=${SPOTIPY_REDIRECT_URI}
       - COOKIE_SECURE=${COOKIE_SECURE:-false}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
