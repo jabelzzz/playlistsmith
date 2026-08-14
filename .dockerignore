@@ -7,3 +7,6 @@ venv/
 .git/
 .gitignore
 *.log
+.cache
+.env
+*.env

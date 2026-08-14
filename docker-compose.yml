@@ -16,7 +16,10 @@ services:
       - SPOTIPY_REDIRECT_URI=${SPOTIPY_REDIRECT_URI}
       - COOKIE_SECURE=${COOKIE_SECURE:-false}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      # python, not curl: the python:3.13-slim base image ships no curl, so a
+      # curl-based probe never turns healthy and blocks the deploy.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 20s

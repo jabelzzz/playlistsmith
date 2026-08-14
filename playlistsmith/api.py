@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import RedirectResponse, JSONResponse
 from pydantic import BaseModel
+from spotipy.cache_handler import MemoryCacheHandler
 from spotipy.oauth2 import SpotifyOAuth
 
 from playlistsmith.services.sort_playlist import PlaylistSorter
@@ -69,8 +70,13 @@ def get_sp_oauth(request: Request):
         # Fallback to env var if building from request fails for any reason
         final_redirect = redirect_uri_env or "http://localhost:8000/callback"
 
+    # MemoryCacheHandler is mandatory here: spotipy's default CacheFileHandler
+    # writes every user's token to a single shared `.cache` file on disk, so one
+    # visitor's login would hand their token to the next visitor.
+    # show_dialog forces the account chooser so a shared browser never silently
+    # re-authorizes as whoever was last logged into accounts.spotify.com.
     return SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=final_redirect,
-                        scope=SPOTIFY_SCOPE)
+                        scope=SPOTIFY_SCOPE, cache_handler=MemoryCacheHandler(), show_dialog=True)
 
 
 @router.get("/login")
@@ -92,7 +98,7 @@ def callback(request: Request, sp_oauth: SpotifyOAuth = Depends(get_sp_oauth)):
         return JSONResponse({"error": "No code provided"}, status_code=400)
 
     try:
-        token_info = sp_oauth.get_access_token(code)
+        token_info = sp_oauth.get_access_token(code, check_cache=False)
     except Exception as exc:
         return JSONResponse({"error": "Failed to obtain access token", "detail": str(exc)}, status_code=500)
 
